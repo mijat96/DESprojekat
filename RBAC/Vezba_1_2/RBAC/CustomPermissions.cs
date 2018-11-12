@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DES
+namespace RBAC
 {
-    class Program
+    public enum Permissions
     {
-        static void Main(string[] args)
-        {
-        }
+        Read,
+        Edit,
+        Add,
+        Delete,
+        Calculate
     }
 }
