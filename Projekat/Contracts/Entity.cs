@@ -11,14 +11,14 @@ namespace Contracts
         private string region;
         private string city;
         private int year;
-        private int consuptionOfElectricity;
+        private List<int> consuptionOfElectricity;
 
         public Entity()
         {
 
         }
 
-        public Entity(int id , string reg,string city,int year,int cons)
+        public Entity(int id, string reg, string city, int year, List<int> cons)
         {
             Id = id;
             Region = reg;
@@ -51,7 +51,7 @@ namespace Contracts
             set { year = value; }
         }
 
-        public int ConsuptionOfElectricity
+        public List<int> ConsuptionOfElectricity
         {
             get { return consuptionOfElectricity; }
             set { consuptionOfElectricity = value; }

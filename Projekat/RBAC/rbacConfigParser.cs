@@ -9,7 +9,7 @@ namespace RBAC
 {
     static class RBACConfigParser
     {
-        private static readonly string path = @"C:\Users\Administrator\Desktop\RBAC_citanjeGrupa\RBAC\Vezba_1_2\ServiceApp\rbac_config.xml";
+        private static readonly string path = AppDomain.CurrentDomain.BaseDirectory + "rbac_config.xml";
 
         public static List<string> GetPermissions(string group)
         {

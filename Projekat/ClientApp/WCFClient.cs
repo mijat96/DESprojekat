@@ -11,9 +11,9 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace ClientApp
 {
-	public class WCFClient : ChannelFactory<IWCFService>, IWCFService, IDisposable
-	{
-		IWCFService factory;
+    public class WCFClient : ChannelFactory<IWCFService>, IWCFService, IDisposable
+    {
+        IWCFService factory;
         public WCFClient(NetTcpBinding binding, EndpointAddress address)
                     : base(binding, address)
         {
@@ -34,82 +34,123 @@ namespace ClientApp
 
         #region Read()
 
-        public bool Read()
+        public Entity Read(int id)
         {
+            Entity retVal = null;
             bool allowed = false;
             try
             {
-                allowed = factory.Read();
+                retVal = factory.Read(id);
+                if (retVal != null)
+                    allowed = true;
 
                 if (allowed)
+                {
                     Console.WriteLine("Read() allowed.");
+
+                    if (retVal.Id == -1)
+                    {
+                        Console.WriteLine("Entity with that id does not exist!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("ID:" + retVal.Id);
+                        Console.WriteLine("Region:" + retVal.Region);
+                        Console.WriteLine("City:" + retVal.City);
+                        Console.WriteLine("Year:" + retVal.Year);
+                        Console.WriteLine("Consumption of electricity:");
+
+                        for (int i = 0; i < retVal.ConsuptionOfElectricity.Count; i++)
+                        {
+                            Console.WriteLine("Month" + (i + 1) + ":" + retVal.ConsuptionOfElectricity[i]);
+                        }
+
+                    }
+                }
                 else
                     Console.WriteLine("Read() not allowed.");
             }
             catch (Exception e)
-			{
-				Console.WriteLine("Error while trying to Read(). {0}", e.Message);
-			}
+            {
+                Console.WriteLine("Error while trying to Read(). {0}", e.Message);
+            }
 
-            return allowed;
+            return retVal;
         }
 
         #endregion
 
         #region Edit()
 
-        public bool Edit()
-		{
-            bool allowed = false;
-            try
-            {
-                allowed = factory.Edit();
-
-                if (allowed)
-                    Console.WriteLine("Edit() allowed.");
-                else
-                    Console.WriteLine("Edit() not allowed.");
-            }
-            catch (Exception e)
-			{
-				Console.WriteLine("Error while trying to Edit(). {0}", e.Message);
-			}
-
-            return allowed;
-		}
-
-		#endregion		
-
-		#region Add()
-		
-		public bool Add()
-		{
-            bool allowed = false;
-			try
-			{
-				allowed = factory.Add();
-
-                if (allowed)
-    				Console.WriteLine("Add() allowed.");
-                else
-                    Console.WriteLine("Add() not allowed.");
-            }
-			catch (Exception e)
-			{
-				Console.WriteLine("Error while trying to Add(). {0}", e.Message);
-			}
-
-            return allowed;
-        }
-        public bool Calculate()
+        public bool Edit(int monthNo, int monthlyConsumption, int idOfEntity)
         {
             bool allowed = false;
             try
             {
-                allowed = factory.Calculate();
+                allowed = factory.Edit(monthNo, monthlyConsumption, idOfEntity);
 
                 if (allowed)
+                {
+                    Console.WriteLine("Edit() allowed.");
+                    Console.WriteLine("Entity with id " + idOfEntity + " changed monthly consumption for month number " + monthNo + " to " + monthlyConsumption);
+                }
+                else
+                    Console.WriteLine("Edit() not allowed.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while trying to Edit(). {0}", e.Message);
+            }
+
+            return allowed;
+        }
+
+        #endregion
+
+        #region Add()
+
+        public bool Add(int id, string region, string city, int year, List<int> consumption)
+        {
+            bool allowed = false;
+            try
+            {
+                allowed = factory.Add(id, region, city, year, consumption);
+
+                if (allowed)
+                {
+                    Console.WriteLine("Add() allowed.");
+                    Console.WriteLine("Entity(" + id + "," + region + "," + city + "," + year + " successfully added");
+                }
+                else
+                    Console.WriteLine("Add() not allowed.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while trying to Add(). {0}", e.Message);
+            }
+
+            return allowed;
+        }
+        #endregion
+
+        #region Calculate
+        public double Calculate(string city)
+        {
+            bool allowed = false;
+            double retVal = -1;
+            try
+            {
+                retVal = factory.Calculate(city);
+                if (retVal != -1)
+                {
+                    allowed = true;
+                }
+
+                if (allowed)
+                {
                     Console.WriteLine("Calculate() allowed.");
+                    Console.WriteLine("Calculation result:" + retVal);
+                }
                 else
                     Console.WriteLine("Calculate() not allowed.");
             }
@@ -118,17 +159,23 @@ namespace ClientApp
                 Console.WriteLine("Error while trying to Calculate(). {0}", e.Message);
             }
 
-            return allowed;
+            return retVal;
         }
-        public bool Delete()
+        #endregion
+
+        #region Delete
+        public bool Delete(int id)
         {
             bool allowed = false;
             try
             {
-                allowed = factory.Delete();
+                allowed = factory.Delete(id);
 
                 if (allowed)
+                {
                     Console.WriteLine("Delete() allowed.");
+                    Console.WriteLine("Entity with id " + id + "successfully deleted");
+                }
                 else
                     Console.WriteLine("Delete() not allowed.");
             }
@@ -149,14 +196,14 @@ namespace ClientApp
         #endregion
 
         public void Dispose()
-		{
-			if (factory != null)
-			{
-				factory = null;
-			}
+        {
+            if (factory != null)
+            {
+                factory = null;
+            }
 
-			this.Close();
-		}
+            this.Close();
+        }
 
         public List<Entity> LoadDataBase()
         {

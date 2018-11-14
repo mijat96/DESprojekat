@@ -6,23 +6,23 @@ using System.ServiceModel;
 
 namespace Contracts
 {
-	[ServiceContract]
-	public interface IWCFService
-	{
-		[OperationContract]
-		bool Read();
-
-		[OperationContract]
-        bool Edit();
-
-		[OperationContract]
-        bool Add();
+    [ServiceContract]
+    public interface IWCFService
+    {
+        [OperationContract]
+        Entity Read(int id);
 
         [OperationContract]
-        bool Calculate();
+        bool Edit(int monthNo, int monthlyConsumption, int idOfEntity);
 
         [OperationContract]
-        bool Delete();
+        bool Add(int id, string region, string city, int year, List<int> consumption);
+
+        [OperationContract]
+        double Calculate(string city);
+
+        [OperationContract]
+        bool Delete(int id);
 
         [OperationContract]
         void WriteInDatabase(List<Entity> entities);
@@ -32,5 +32,5 @@ namespace Contracts
 
         [OperationContract]
         void KonektujServise(string adresa);
-	}
+    }
 }

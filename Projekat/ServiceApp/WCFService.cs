@@ -14,9 +14,9 @@ using RBAC;
 
 namespace ServiceApp
 {
-	public class WCFService : IWCFService
-	{
-		public bool Read()
+    public class WCFService : IWCFService
+    {
+        public Entity Read(int id)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
 
@@ -25,16 +25,22 @@ namespace ServiceApp
             if (principal.IsInRole(permission))
             {
                 Console.WriteLine("Read() successfully executed.");
-                return true;
+
+                Entity e = DataBase.ReadFromBase(id);
+
+                return e;
+
             }
             else
             {
                 Console.WriteLine("Read() unsuccessfully executed.");
-                return false;
+                Entity e = null;
+                return e;
+
             }
         }
 
-        public bool Edit()
+        public bool Edit(int monthNo, int monthlyConsumption, int idOfEntity)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
 
@@ -43,6 +49,7 @@ namespace ServiceApp
             if (principal.IsInRole(permission))
             {
                 Console.WriteLine("Edit() successfully executed.");
+                DataBase.EditBase(monthNo, monthlyConsumption, idOfEntity);
                 return true;
             }
             else
@@ -50,9 +57,9 @@ namespace ServiceApp
                 Console.WriteLine("Edit() unsuccessfully executed.");
                 return false;
             }
-        }		
+        }
 
-		public bool Add()
+        public bool Add(int id, string region, string city, int year, List<int> consumption)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
 
@@ -61,6 +68,7 @@ namespace ServiceApp
             if (principal.IsInRole(permission))
             {
                 Console.WriteLine("Add() successfully executed.");
+                DataBase.AddToBase(id, region, city, year, consumption);
                 return true;
             }
             else
@@ -70,7 +78,7 @@ namespace ServiceApp
             }
         }
 
-        public bool Delete()
+        public bool Delete(int id)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
 
@@ -79,6 +87,7 @@ namespace ServiceApp
             if (principal.IsInRole(permission))
             {
                 Console.WriteLine("Delete() successfully executed.");
+                DataBase.DeleteFromBase(id);
                 return true;
             }
             else
@@ -87,22 +96,23 @@ namespace ServiceApp
                 return false;
             }
         }
-        public bool Calculate()
+        public double Calculate(string city)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+            double retVal = 0;
 
             var permission = Permissions.Calculate.ToString().ToLower();
 
             if (principal.IsInRole(permission))
             {
                 Console.WriteLine("Calculate() successfully executed.");
-
-                return true;
+                retVal = DataBase.CalculateAvgValue(city);
+                return retVal;
             }
             else
             {
                 Console.WriteLine("Calculate() unsuccessfully executed.");
-                return false;
+                return -1;
             }
         }
 
@@ -117,11 +127,11 @@ namespace ServiceApp
             int year = 0;
             int cons = 0;
 
-            using (XmlReader reader = XmlReader.Create(@"C:\Users\Administrator\Desktop\aaaa\Vezba_1_2\ServiceApp\bin\x64\Debug\DataBase" + count +".xml"))
+            using (XmlReader reader = XmlReader.Create(@"C:\Users\Administrator\Desktop\aaaa\Vezba_1_2\ServiceApp\bin\x64\Debug\DataBase" + count + ".xml"))
             {
                 while (reader.Read())
                 {
-                    if(reader.IsStartElement() && reader.Name.Equals("Entity"))
+                    if (reader.IsStartElement() && reader.Name.Equals("Entity"))
                     {
                         while (true)
                         {
@@ -137,10 +147,10 @@ namespace ServiceApp
                             }
                         }
 
-                        while(true)
-                        { 
+                        while (true)
+                        {
 
-                            if(reader.Name.Equals("Region"))
+                            if (reader.Name.Equals("Region"))
                             {
                                 reader.Read();
                                 region = reader.Value;
@@ -152,9 +162,9 @@ namespace ServiceApp
                             }
                         }
 
-                        while(true)
+                        while (true)
                         {
-                            if(reader.Name.Equals("City"))
+                            if (reader.Name.Equals("City"))
                             {
                                 reader.Read();
                                 city = reader.Value;
@@ -166,9 +176,9 @@ namespace ServiceApp
                             }
                         }
 
-                        while(true)
+                        while (true)
                         {
-                            if(reader.Name.Equals("Year"))
+                            if (reader.Name.Equals("Year"))
                             {
                                 reader.Read();
                                 int.TryParse(reader.Value, out year);
@@ -180,15 +190,15 @@ namespace ServiceApp
                             }
                         }
 
-                        while(true)
+                        while (true)
                         {
                             if (reader.Name.Equals("ConsumptionOfElectricity"))
                             {
                                 reader.Read();
                                 int.TryParse(reader.Value, out cons);
 
-                                Entity e = new Entity(id, region, city, year, cons);
-                                ret.Add(e);
+                                //Entity e = new Entity(id, region, city, year, cons);
+                                //ret.Add(e);
                                 break;
                             }
                             else
@@ -220,7 +230,7 @@ namespace ServiceApp
 
                 writer.WriteStartElement("Entities");
 
-                foreach(Entity e in entities)
+                foreach (Entity e in entities)
                 {
                     writer.WriteStartElement("Entity");
                     writer.WriteElementString("Id", e.Id.ToString());

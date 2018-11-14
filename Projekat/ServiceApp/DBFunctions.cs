@@ -161,7 +161,13 @@ namespace ServiceApp
                     writer.WriteElementString("Region", e.Region);
                     writer.WriteElementString("City", e.City);
                     writer.WriteElementString("Year", e.Year.ToString());
-                    writer.WriteElementString("ConsumptionOfElectricity", e.ConsuptionOfElectricity.ToString());
+                    writer.WriteStartElement("ConsumptionOfElectricity");
+
+                    foreach (int i in e.ConsuptionOfElectricity)
+                    {
+                        writer.WriteElementString("MonthlyConsumption", i.ToString());
+                    }
+                    writer.WriteEndElement();
 
                     writer.WriteEndElement();
                 }
@@ -233,7 +239,6 @@ namespace ServiceApp
             string region = "";
             string city = "";
             int year = 0;
-            int cons = 0;
 
             using (XmlReader reader = XmlReader.Create(AppDomain.CurrentDomain.BaseDirectory + "DataBase.xml"))
             {
@@ -302,10 +307,23 @@ namespace ServiceApp
                         {
                             if (reader.Name.Equals("ConsumptionOfElectricity"))
                             {
+                                List<int> consu = new List<int>();
                                 reader.Read();
-                                int.TryParse(reader.Value, out cons);
+                                reader.Read();
+                                reader.Read();
 
-                                Entity e = new Entity(id, region, city, year, cons);
+                                while (reader.Name != "ConsumptionOfElectricity")
+                                {
+                                    consu.Add(int.Parse(reader.Value));
+
+                                    reader.Read();
+                                    reader.Read();
+                                    reader.Read();
+                                    if (consu.Count != 12)
+                                        reader.Read();
+                                }
+
+                                Entity e = new Entity(id, region, city, year, consu);
                                 ret.Add(e);
                                 break;
                             }
@@ -344,7 +362,6 @@ namespace ServiceApp
             string region = "";
             string city = "";
             int year = 0;
-            int cons = 0;
 
             using (XmlReader reader = XmlReader.Create(AppDomain.CurrentDomain.BaseDirectory + "RecivedDB.xml"))
             {
@@ -413,10 +430,23 @@ namespace ServiceApp
                         {
                             if (reader.Name.Equals("ConsumptionOfElectricity"))
                             {
+                                List<int> consu = new List<int>();
                                 reader.Read();
-                                int.TryParse(reader.Value, out cons);
+                                reader.Read();
+                                reader.Read();
 
-                                Entity e = new Entity(id, region, city, year, cons);
+                                while (reader.Name != "ConsumptionOfElectricity")
+                                {
+                                    consu.Add(int.Parse(reader.Value));
+
+                                    reader.Read();
+                                    reader.Read();
+                                    reader.Read();
+                                    if (consu.Count != 12)
+                                        reader.Read();
+                                }
+
+                                Entity e = new Entity(id, region, city, year, consu);
                                 retVal.Add(e);
                                 break;
                             }

@@ -10,10 +10,10 @@ using System.Security.Principal;
 
 namespace ClientApp
 {
-	public class Program
-	{
-		static void Main(string[] args)
-		{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
             Console.WriteLine("Unesite broj porta: ");
             int brojPorta = Int32.Parse(Console.ReadLine());
 
@@ -30,26 +30,54 @@ namespace ClientApp
             //Console.WriteLine("Ovo je grupa "+ grupa);
             int response;
             using (WCFClient proxy = new WCFClient(binding, address2))
-			{
+            {
                 do
                 {
                     response = ClientMenu.Menu();
                     switch (response)
                     {
                         case 1:
-                            proxy.Add();
+                            Console.WriteLine("Enter Id(must be number):");
+                            int id = int.Parse(Console.ReadLine());
+                            Console.WriteLine("Enter region:");
+                            string reg = Console.ReadLine();
+                            Console.WriteLine("Enter city:");
+                            string city = Console.ReadLine();
+                            Console.WriteLine("Enter year:");
+                            int year = int.Parse(Console.ReadLine());
+                            List<int> consum = new List<int>();
+                            int m = 0;
+                            for (int i = 0; i < 12; i++)
+                            {
+                                Console.WriteLine("Enter consumption of electricity for month" + (i + 1));
+                                m = int.Parse(Console.ReadLine());
+                                consum.Add(m);
+                            }
+                            proxy.Add(id, reg, city, year, consum);
                             break;
                         case 2:
-                            proxy.Read();
+                            Console.WriteLine("Enter id of entity you want to read:");
+                            int Id = int.Parse(Console.ReadLine());
+                            proxy.Read(Id);
                             break;
                         case 3:
-                            proxy.Edit();
+                            Console.WriteLine("Enter id of entity you want to edit:");
+                            int idOfEntity = int.Parse(Console.ReadLine());
+                            Console.WriteLine("Enter month number you want to edit consumption of electricity:");
+                            int monthNo = int.Parse(Console.ReadLine());
+                            Console.WriteLine("Enter new value for consumption of electricity:");
+                            int consumption = int.Parse(Console.ReadLine());
+                            proxy.Edit(monthNo, consumption, idOfEntity);
                             break;
                         case 4:
-                            proxy.Delete();
+                            Console.WriteLine("Enter id of entity you want to delete:");
+                            int IdE = int.Parse(Console.ReadLine());
+                            proxy.Delete(IdE);
                             break;
                         case 5:
-                            proxy.Calculate();
+                            Console.WriteLine("Enter city name for which you want to calculate consumption of electricity:");
+                            string c = Console.ReadLine();
+                            proxy.Calculate(c);
                             break;
                         case 6:
                             Console.WriteLine("Goodbye!");
@@ -61,8 +89,6 @@ namespace ClientApp
                     }
                 } while (response != 6);
             }
-
-			Console.ReadLine();
-		}
-	}
+        }
+    }
 }
